@@ -13,6 +13,24 @@ const MoonIcon = () => (
   </svg>
 )
 
+
+/** Link licence names in the footer line. Handles "Text: CC BY 4.0" and the earlier "Text: CC BY 4.0 · Code: MIT". */
+function LicenceNote({text}: {text: string}) {
+  const CC = 'https://creativecommons.org/licenses/by/4.0/'
+  const MIT = 'https://opensource.org/license/mit'
+  const parts = text.split(/(CC BY 4\.0|MIT)/g)
+  if (parts.length === 1) return <>{text}</>
+  return (
+    <>
+      {parts.map((part, i) => {
+        if (part === 'CC BY 4.0') return <a key={i} href={CC} rel="license noopener">CC BY 4.0</a>
+        if (part === 'MIT') return <a key={i} href={MIT} rel="license noopener">MIT</a>
+        return part || null
+      })}
+    </>
+  )
+}
+
 export function Header({settings, path}: {settings: any; path: string}) {
   const nav = (settings.mainNav || []).filter((l: any) => clean(l.label) && safeHref(l.href))
   return (
@@ -55,16 +73,7 @@ export function Footer({settings, year}: {settings: any; year: number}) {
       <div className="container site-footer__inner">
         <div className="site-footer__meta">
           {clean(f.tagline) && <p className="site-footer__tagline">{f.tagline}</p>}
-          {licence && (
-            <p>
-              {licence === 'Text: CC BY 4.0 · Code: MIT' ? (
-                <>
-                  Text: <a href="https://creativecommons.org/licenses/by/4.0/" rel="license noopener">CC BY 4.0</a> · Code:{' '}
-                  <a href="https://opensource.org/license/mit" rel="license noopener">MIT</a>
-                </>
-              ) : licence}
-            </p>
-          )}
+          {licence && <p><LicenceNote text={licence} /></p>}
           {clean(f.locationNote) && <p>{f.locationNote}</p>}
           {copyright && <p>© {year} {copyright}</p>}
         </div>

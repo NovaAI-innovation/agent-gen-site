@@ -49,3 +49,28 @@ export function ownerAttribution(about?: any): {label: string; href: string} | u
 
 export const isOwnerVoice = (voice?: string | null) => voice === 'owner'
 
+/** User-facing name for the /notes/ collection. Routes and field names stay "notes". */
+export const BLOG_LABEL = 'Blog'
+
+/** Blog index title, lede and meta from Sanity when Content provides them. */
+export function blogIndex(content?: any): {title: string; lede?: string; metaTitle?: string; metaDescription?: string} {
+  const idx = content?.notesPage || content?.settings?.blogIndex || content?.blogIndex
+  const title = clean(idx?.title) || BLOG_LABEL
+  const fromBody = Array.isArray(idx?.body)
+    ? clean((idx.body as any[]).map(blockText).join(' ').replace(/\s+/g, ' '))
+    : undefined
+  const lede = clean(idx?.lede) || clean(idx?.intro) || fromBody
+  const metaTitle = clean(idx?.seo?.metaTitle) || clean(idx?.metaTitle)
+  const metaDescription = clean(idx?.seo?.metaDescription) || clean(idx?.metaDescription) || lede
+  return {title, lede, metaTitle, metaDescription}
+}
+
+/** 404 heading, lede and home-button label from Sanity, with neutral fallbacks. */
+export function notFoundCopy(content?: any): {heading: string; lede: string; homeLabel: string} {
+  const n = content?.settings?.notFound || content?.notFound
+  return {
+    heading: clean(n?.heading) || 'This page isn’t here',
+    lede: clean(n?.lede) || 'The link may be old or mistyped.',
+    homeLabel: clean(n?.homeLabel) || 'Go to the home page',
+  }
+}

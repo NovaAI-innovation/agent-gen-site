@@ -1,8 +1,10 @@
 import {PortableText} from '../components/PortableText'
-import {clean, noteUrl} from '../lib/content'
+import {clean, noteUrl, blogIndex} from '../lib/content'
 import {Tags, formatDate} from './shared'
 
-export function Post({post, prev, next}: {post: any; prev?: any; next?: any}) {
+export function Post({post, prev, next, content}: {post: any; prev?: any; next?: any; content?: any}) {
+  const collection = blogIndex(content)
+  const allLabel = clean(content?.home?.latestNotes?.allLabel) || 'All posts'
   const date = formatDate(post.publishedAt)
   const updated = formatDate(post.updatedAt)
   const author = clean(post.authorName)
@@ -11,7 +13,7 @@ export function Post({post, prev, next}: {post: any; prev?: any; next?: any}) {
       <nav aria-label="Breadcrumb" className="breadcrumb">
         <ol>
           <li><a href="/">Home</a></li>
-          <li><a href="/notes/">Notes</a></li>
+          <li><a href="/notes/">{collection.title}</a></li>
           <li><a href={noteUrl(post.slug)} aria-current="page">{post.title}</a></li>
         </ol>
       </nav>
@@ -32,12 +34,12 @@ export function Post({post, prev, next}: {post: any; prev?: any; next?: any}) {
           <PortableText value={post.body} />
         </div>
       </article>
-      <nav aria-label="More notes" className="prevnext">
+      <nav aria-label="More posts" className="prevnext">
         <ul role="list">
-          <li>{prev && <a href={noteUrl(prev.slug)} rel="prev"><span className="prevnext__dir">Previous note</span><span className="prevnext__title">{prev.title}</span></a>}</li>
-          <li>{next && <a href={noteUrl(next.slug)} rel="next"><span className="prevnext__dir">Next note</span><span className="prevnext__title">{next.title}</span></a>}</li>
+          <li>{prev && <a href={noteUrl(prev.slug)} rel="prev"><span className="prevnext__dir">Previous post</span><span className="prevnext__title">{prev.title}</span></a>}</li>
+          <li>{next && <a href={noteUrl(next.slug)} rel="next"><span className="prevnext__dir">Next post</span><span className="prevnext__title">{next.title}</span></a>}</li>
         </ul>
-        <p className="prevnext__home"><a href="/notes/">All notes</a> · <a href="/">Home</a></p>
+        <p className="prevnext__home"><a href="/notes/">{allLabel}</a> · <a href="/">Home</a></p>
       </nav>
     </div>
   )

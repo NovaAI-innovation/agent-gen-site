@@ -42,12 +42,13 @@ const client = createClient({
 })
 
 const query = `{
-  "settings": *[_id == "siteSettings"][0]{_updatedAt, siteTitle, tagline, description, siteUrl, locale, owner, github, mainNav, footer, defaultSeo},
+  "settings": *[_id == "siteSettings"][0]{_updatedAt, siteTitle, tagline, description, siteUrl, locale, owner, github, mainNav, footer, defaultSeo, blogIndex, notFound},
   "home": *[_id == "homePage"][0]{_updatedAt, hero, purposeSections[]{..., "anchor": anchor.current, items[]{..., voice}}, contentSection{..., "anchor": anchor.current, cards[]{..., voice}}, latestNotes, comingSoonNotice, seo},
   "posts": *[_type == "post" && defined(slug.current)] | order(coalesce(publishedAt, _updatedAt) desc, title asc){
     _id, _updatedAt, title, "slug": slug.current, summary, publishedAt, updatedAt, tags, authorName, body, seo
   },
-  "about": *[_type == "page" && slug.current == "about"][0]{_updatedAt, title, "slug": slug.current, publishedAt, updatedAt, body, seo, sections[]{heading, voice, "anchor": anchor.current, body}}
+  "about": *[_type == "page" && slug.current == "about"][0]{_updatedAt, title, "slug": slug.current, publishedAt, updatedAt, body, seo, sections[]{heading, voice, "anchor": anchor.current, body}},
+  "notesPage": *[_type == "page" && slug.current == "notes"][0]{_updatedAt, title, "slug": slug.current, body, seo}
 }`
 
 try {
@@ -55,7 +56,7 @@ try {
   if (!data.settings || !data.home) throw new Error('siteSettings or homePage missing')
   mkdirSync('.content', {recursive: true})
   writeFileSync('.content/content.json', JSON.stringify({fetchedAt: new Date().toISOString(), siteEnv: SITE_ENV, ...data}, null, 2))
-  console.log(`fetch-content: ${SITE_ENV} (${SITE_ENV === 'production' ? 'published' : 'drafts'}) -> ${data.posts.length} posts, about=${!!data.about}`)
+  console.log(`fetch-content: ${SITE_ENV} (${SITE_ENV === 'production' ? 'published' : 'drafts'}) -> ${data.posts.length} posts, about=${!!data.about}, notesPage=${!!data.notesPage}`)
 } catch (err) {
   // Never echo the client config (it holds the token).
   console.error('fetch-content: Sanity fetch failed:', err?.statusCode || '', err?.message?.replace(token, '<redacted>'))

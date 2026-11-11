@@ -21,7 +21,7 @@ export const site = {
     width: 1200,
     height: 630,
     type: 'image/png',
-    alt: 'agent-gen wordmark beside a network of teal and amber nodes, with the line: Notes on AI agents.',
+    alt: 'agent-gen wordmark beside a network of teal and amber nodes, some still open, with the line: An open hub for AI agents, growing as it goes.',
   },
   sanity: {
     projectId: 'jqsksqmz',

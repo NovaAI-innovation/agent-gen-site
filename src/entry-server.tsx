@@ -7,7 +7,7 @@ import {Post} from './pages/Post'
 import {About} from './pages/About'
 import {NotFound} from './pages/NotFound'
 import {site, type SiteEnv} from './site.config'
-import {clean, noteUrl} from './lib/content'
+import {clean, noteUrl, blogIndex} from './lib/content'
 
 export interface PageOut { path: string; file: string; html: string; head: string; graph: boolean; code: boolean; inSitemap: boolean; lastmod?: string }
 
@@ -62,6 +62,11 @@ export function buildPages(content: any, env: SiteEnv): {pages: PageOut[]; lang:
   const website = {'@type': 'WebSite', '@id': `${site.productionUrl}/#website`, url: `${site.productionUrl}/`, name: siteName, description: clean(settings.description), inLanguage: lang}
   const crumbs = (items: [string, string][]) => ({'@type': 'BreadcrumbList', itemListElement: items.map(([name, p], i) => ({'@type': 'ListItem', position: i + 1, name, item: site.productionUrl + p}))})
 
+  const index = blogIndex(content)
+  const indexTitle = index.title
+  const indexDesc = index.metaDescription || 'The agent-gen blog.'
+  const indexMetaTitle = index.metaTitle || `${indexTitle} · ${siteName}`
+
   const pages: PageOut[] = []
   const hs = home.seo || def
   pages.push({
@@ -72,10 +77,10 @@ export function buildPages(content: any, env: SiteEnv): {pages: PageOut[]; lang:
   })
 
   pages.push({
-    path: '/notes/', file: 'notes/index.html', graph: false, code: false, inSitemap: true,
+    path: '/notes/', file: 'notes/index.html', graph: false, code: false, inSitemap: true, lastmod: lastmodOf(content.notesPage),
     html: wrap('/notes/', <NotesIndex content={content} />),
-    head: head({...base, path: '/notes/', title: `Notes · ${siteName}`, description: 'Short posts on how AI agents work and what we learn while building them.',
-      jsonLd: {'@context': 'https://schema.org', '@graph': [{'@type': 'CollectionPage', name: 'Notes', url: `${site.productionUrl}/notes/`, isPartOf: {'@id': `${site.productionUrl}/#website`}}, crumbs([['Home', '/'], ['Notes', '/notes/']])]}}),
+    head: head({...base, path: '/notes/', title: indexMetaTitle, description: indexDesc,
+      jsonLd: {'@context': 'https://schema.org', '@graph': [{'@type': 'CollectionPage', name: indexTitle, url: `${site.productionUrl}/notes/`, isPartOf: {'@id': `${site.productionUrl}/#website`}}, crumbs([['Home', '/'], [indexTitle, '/notes/']])]}}),
   })
 
   posts.forEach((p: any, i: number) => {
@@ -88,9 +93,9 @@ export function buildPages(content: any, env: SiteEnv): {pages: PageOut[]; lang:
     if (clean(p.authorName)) posting.author = {'@type': 'Organization', name: p.authorName}
     pages.push({
       path, file: `notes/${p.slug}/index.html`, graph: false, code: hasCode, inSitemap: true, lastmod: lastmodOf(p),
-      html: wrap(path, <Post post={p} prev={posts[i + 1]} next={posts[i - 1]} />),
+      html: wrap(path, <Post post={p} prev={posts[i + 1]} next={posts[i - 1]} content={content} />),
       head: head({...base, path, title: s.metaTitle || p.title, description: s.metaDescription || p.summary, ogTitle: s.ogTitle, ogDescription: s.ogDescription, ogType: 'article', noIndex: s.noIndex,
-        jsonLd: {'@context': 'https://schema.org', '@graph': [posting, crumbs([['Home', '/'], ['Notes', '/notes/'], [p.title, path]])]}}),
+        jsonLd: {'@context': 'https://schema.org', '@graph': [posting, crumbs([['Home', '/'], [indexTitle, '/notes/'], [p.title, path]])]}}),
     })
   })
 
@@ -106,7 +111,7 @@ export function buildPages(content: any, env: SiteEnv): {pages: PageOut[]; lang:
 
   pages.push({
     path: '/404', file: '404.html', graph: false, code: false, inSitemap: false,
-    html: wrap('/404', <NotFound />),
+    html: wrap('/404', <NotFound content={content} />),
     head: head({...base, path: '/404', title: `Page not found · ${siteName}`, description: 'This page could not be found.', noIndex: true, includeUrl: false}),
   })
   return {pages, lang}

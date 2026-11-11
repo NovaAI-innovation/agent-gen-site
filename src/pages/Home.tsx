@@ -59,9 +59,8 @@ function Purpose({section, index, owner}: {section: any; index: number; owner?: 
   )
 }
 
-function Coming({section, notice, settings, owner}: {section: any; notice: any; settings: any; owner?: {label: string; href: string}}) {
+function Coming({section, owner}: {section: any; owner?: {label: string; href: string}}) {
   const cards = (section.cards || []).filter((c: any) => clean(c.title) && clean(c.description))
-  const gh = notice?.showCodeLink ? githubOrgUrl(settings) : undefined
   return (
     <section className="band coming" id={section.anchor} aria-labelledby={`${section.anchor}-h`}>
       <div className="container">
@@ -82,13 +81,22 @@ function Coming({section, notice, settings, owner}: {section: any; notice: any; 
           ))}
         </ul>
         {clean(section.statusNote) && <p className="coming__note">{section.statusNote}</p>}
-        {notice?.enabled !== false && clean(notice?.heading) && clean(notice?.body) && (
-          <aside className="notice" aria-labelledby="notice-h">
-            <h3 id="notice-h">{notice.heading}</h3>
-            <p>{notice.body}</p>
-            {gh && <p><a href={gh} rel="noopener">View the code</a></p>}
-          </aside>
-        )}
+      </div>
+    </section>
+  )
+}
+
+function CodeNotice({notice, settings}: {notice: any; settings: any}) {
+  if (notice?.enabled === false || !clean(notice?.heading) || !clean(notice?.body)) return null
+  const gh = notice?.showCodeLink ? githubOrgUrl(settings) : undefined
+  return (
+    <section className="band" aria-labelledby="notice-h">
+      <div className="container">
+        <aside className="notice" aria-labelledby="notice-h">
+          <h3 id="notice-h">{notice.heading}</h3>
+          <p>{notice.body}</p>
+          {gh && <p><a href={gh} rel="noopener">View the code</a></p>}
+        </aside>
       </div>
     </section>
   )
@@ -101,15 +109,15 @@ function Latest({cfg, posts}: {cfg: any; posts: any[]}) {
     <section className="band latest" aria-labelledby="latest-h">
       <div className="container">
         <div className="band__head band__head--row">
-          <h2 id="latest-h">{clean(cfg?.heading) || 'Latest notes'}</h2>
-          {list.length > 0 && <a className="arrow-link" href="/notes/">{clean(cfg?.allLabel) || 'All notes'}<span aria-hidden="true"> →</span></a>}
+          <h2 id="latest-h">{clean(cfg?.heading) || 'Latest posts'}</h2>
+          {list.length > 0 && <a className="arrow-link" href="/notes/">{clean(cfg?.allLabel) || 'All posts'}<span aria-hidden="true"> →</span></a>}
         </div>
         {list.length ? (
           <ul className="cards" role="list">
             {list.map((p) => <li key={p.slug}><PostCard post={p} headingLevel={3} /></li>)}
           </ul>
         ) : (
-          <p>{clean(cfg?.emptyText) || 'The first notes are on the way.'}</p>
+          <p>{clean(cfg?.emptyText) || 'Nothing here yet.'}</p>
         )}
       </div>
     </section>
@@ -123,7 +131,8 @@ export function Home({content}: {content: any}) {
     <>
       <Hero hero={home.hero} />
       {(home.purposeSections || []).map((s: any, i: number) => <Purpose key={s._key} section={s} index={i} owner={owner} />)}
-      {home.contentSection && <Coming section={home.contentSection} notice={home.comingSoonNotice} settings={settings} owner={owner} />}
+      {home.contentSection && <Coming section={home.contentSection} owner={owner} />}
+      <CodeNotice notice={home.comingSoonNotice} settings={settings} />
       <Latest cfg={home.latestNotes} posts={posts} />
     </>
   )
