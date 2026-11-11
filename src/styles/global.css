@@ -133,6 +133,10 @@ html:not(.js) .theme-toggle { display: none; }
 }
 .purpose--secondary { background: var(--color-surface-sunken); }
 
+.owner-attr { margin: var(--space-2) 0 0; font-size: var(--text-sm); line-height: var(--leading-sm); color: var(--color-text-muted); }
+.owner-attr a { color: var(--color-accent); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.18em; }
+.owner-attr a:hover { color: var(--color-accent-hover); text-decoration-thickness: 2px; }
+
 .coming__list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-4); }
 .coming__card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-6); display: grid; gap: var(--space-3); align-content: start; }
 .coming__card p { color: var(--color-text-muted); }

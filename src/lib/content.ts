@@ -35,3 +35,17 @@ export function blockText(block: any): string {
   if (block?._type === 'figure') return `${block.alt || ''} ${block.caption || ''}`
   return ''
 }
+
+/** About section whose voice is Casey ("I"). Used to attribute owner-voice items, with no name on the page. */
+export function ownerAttribution(about?: any): {label: string; href: string} | undefined {
+  const section = (about?.sections || []).find((s: any) => s?.voice === 'owner')
+  const label = clean(section?.heading)
+  if (!label) return undefined
+  const raw = (typeof section.anchor === 'string' && section.anchor.trim())
+    ? section.anchor.trim()
+    : label.toLowerCase().replace(/['’]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+  return {label, href: raw ? `/about/#${raw}` : '/about/'}
+}
+
+export const isOwnerVoice = (voice?: string | null) => voice === 'owner'
+

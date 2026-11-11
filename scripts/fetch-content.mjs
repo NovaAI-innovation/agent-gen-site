@@ -8,11 +8,15 @@ import {loadEnv} from './load-env.mjs'
 loadEnv()
 
 const SITE_ENV = process.env.SITE_ENV === 'production' ? 'production' : 'preview'
-const envFile = process.env.SANITY_ENV_FILE || '/workspace/secrets/sanity-agent-gen.env'
+const envFile = process.env.SANITY_ENV_FILE
+if (!process.env.SANITY_READ_TOKEN && !envFile) {
+  console.error('fetch-content: SANITY_READ_TOKEN or SANITY_ENV_FILE is not set. Copy .env.example to .env and fill in values.')
+  process.exit(1)
+}
 
 function loadToken() {
   if (process.env.SANITY_READ_TOKEN) return process.env.SANITY_READ_TOKEN
-  if (!existsSync(envFile)) return undefined
+  if (!envFile || !existsSync(envFile)) return undefined
   for (const line of readFileSync(envFile, 'utf8').split('\n')) {
     const m = line.match(/^\s*SANITY_READ_TOKEN\s*=\s*"?([^"\n]+)"?\s*$/)
     if (m) return m[1].trim()
@@ -22,7 +26,8 @@ function loadToken() {
 
 const token = loadToken()
 if (!token) {
-  console.error(`fetch-content: no SANITY_READ_TOKEN (env or ${envFile}). The dataset is private; cannot build.`)
+  const where = process.env.SANITY_READ_TOKEN ? 'SANITY_READ_TOKEN' : (envFile ? 'SANITY_ENV_FILE (file missing or has no SANITY_READ_TOKEN)' : 'SANITY_READ_TOKEN or SANITY_ENV_FILE')
+  console.error(`fetch-content: ${where} did not provide a token. Copy .env.example to .env and fill in values. The dataset is private; cannot build.`)
   process.exit(1)
 }
 
@@ -38,7 +43,7 @@ const client = createClient({
 
 const query = `{
   "settings": *[_id == "siteSettings"][0]{_updatedAt, siteTitle, tagline, description, siteUrl, locale, owner, github, mainNav, footer, defaultSeo},
-  "home": *[_id == "homePage"][0]{_updatedAt, hero, purposeSections[]{..., "anchor": anchor.current}, contentSection{..., "anchor": anchor.current}, latestNotes, comingSoonNotice, seo},
+  "home": *[_id == "homePage"][0]{_updatedAt, hero, purposeSections[]{..., "anchor": anchor.current, items[]{..., voice}}, contentSection{..., "anchor": anchor.current, cards[]{..., voice}}, latestNotes, comingSoonNotice, seo},
   "posts": *[_type == "post" && defined(slug.current)] | order(coalesce(publishedAt, _updatedAt) desc, title asc){
     _id, _updatedAt, title, "slug": slug.current, summary, publishedAt, updatedAt, tags, authorName, body, seo
   },

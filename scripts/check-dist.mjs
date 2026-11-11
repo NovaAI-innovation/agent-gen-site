@@ -7,13 +7,17 @@ import {loadEnv} from './load-env.mjs'
 loadEnv()
 
 const SITE_ENV = process.env.SITE_ENV === 'production' ? 'production' : 'preview'
-const envFile = process.env.SANITY_ENV_FILE || '/workspace/secrets/sanity-agent-gen.env'
+const envFile = process.env.SANITY_ENV_FILE
+if (!process.env.SANITY_READ_TOKEN && !envFile) {
+  console.error('check-dist: SANITY_READ_TOKEN or SANITY_ENV_FILE is not set. Copy .env.example to .env and fill in values.')
+  process.exit(1)
+}
 const files = []
 const walk = (d) => readdirSync(d).forEach((f) => { const p = join(d, f); statSync(p).isDirectory() ? walk(p) : files.push(p) })
 walk('dist')
 
 const secrets = []
-if (existsSync(envFile)) for (const line of readFileSync(envFile, 'utf8').split('\n')) {
+if (envFile && existsSync(envFile)) for (const line of readFileSync(envFile, 'utf8').split('\n')) {
   const m = line.match(/^\s*(SANITY_[A-Z_]*TOKEN)\s*=\s*"?([^"\n]+)"?/)
   if (m) secrets.push([m[1], m[2].trim()])
 }

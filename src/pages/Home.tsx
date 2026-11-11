@@ -1,6 +1,6 @@
 import {AgentGraph} from '../components/AgentGraph'
-import {clean, safeHref, noteUrl, githubOrgUrl} from '../lib/content'
-import {PostCard} from './shared'
+import {clean, safeHref, noteUrl, githubOrgUrl, ownerAttribution, isOwnerVoice} from '../lib/content'
+import {OwnerAttr, PostCard} from './shared'
 
 function Hero({hero}: {hero: any}) {
   const cta = hero.primaryCta
@@ -34,7 +34,7 @@ function Hero({hero}: {hero: any}) {
   )
 }
 
-function Purpose({section, index}: {section: any; index: number}) {
+function Purpose({section, index, owner}: {section: any; index: number; owner?: {label: string; href: string}}) {
   const items = (section.items || []).filter((it: any) => clean(it.title) && clean(it.body))
   const numbered = items.some((it: any) => clean(it.label))
   return (
@@ -50,6 +50,7 @@ function Purpose({section, index}: {section: any; index: number}) {
               {clean(it.label) && <span className="purpose__label" aria-hidden="true">{it.label}</span>}
               <h3>{it.title}</h3>
               <p>{it.body}</p>
+              {owner && isOwnerVoice(it.voice) && <OwnerAttr attr={owner} />}
             </li>
           ))}
         </ol>
@@ -58,7 +59,7 @@ function Purpose({section, index}: {section: any; index: number}) {
   )
 }
 
-function Coming({section, notice, settings}: {section: any; notice: any; settings: any}) {
+function Coming({section, notice, settings, owner}: {section: any; notice: any; settings: any; owner?: {label: string; href: string}}) {
   const cards = (section.cards || []).filter((c: any) => clean(c.title) && clean(c.description))
   const gh = notice?.showCodeLink ? githubOrgUrl(settings) : undefined
   return (
@@ -76,6 +77,7 @@ function Coming({section, notice, settings}: {section: any; notice: any; setting
                 {clean(c.statusLabel) && <span className="pill">{c.statusLabel}</span>}
               </div>
               <p>{c.description}</p>
+              {owner && isOwnerVoice(c.voice) && <OwnerAttr attr={owner} />}
             </li>
           ))}
         </ul>
@@ -115,12 +117,13 @@ function Latest({cfg, posts}: {cfg: any; posts: any[]}) {
 }
 
 export function Home({content}: {content: any}) {
-  const {home, settings, posts} = content
+  const {home, settings, posts, about} = content
+  const owner = ownerAttribution(about)
   return (
     <>
       <Hero hero={home.hero} />
-      {(home.purposeSections || []).map((s: any, i: number) => <Purpose key={s._key} section={s} index={i} />)}
-      {home.contentSection && <Coming section={home.contentSection} notice={home.comingSoonNotice} settings={settings} />}
+      {(home.purposeSections || []).map((s: any, i: number) => <Purpose key={s._key} section={s} index={i} owner={owner} />)}
+      {home.contentSection && <Coming section={home.contentSection} notice={home.comingSoonNotice} settings={settings} owner={owner} />}
       <Latest cfg={home.latestNotes} posts={posts} />
     </>
   )

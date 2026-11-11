@@ -1,5 +1,13 @@
 import {clean, noteUrl} from '../lib/content'
 
+export function OwnerAttr({attr}: {attr: {label: string; href: string}}) {
+  return (
+    <p className="owner-attr">
+      <a href={attr.href}>{attr.label}</a>
+    </p>
+  )
+}
+
 export function Tags({tags}: {tags?: string[]}) {
   const list = (tags || []).filter((t) => clean(t))
   if (!list.length) return null
