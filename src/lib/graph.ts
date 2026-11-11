@@ -40,7 +40,7 @@ export function makeGraph(seed: number, count = 30): Graph {
     const x = W / 2 + Math.cos(ang) * rad * (W * 0.46)
     const y = H / 2 + Math.sin(ang) * rad * (H * 0.44)
     if (nodes.some((n) => (n.x - x) ** 2 + (n.y - y) ** 2 < 78 ** 2)) continue
-    nodes.push({x, y, r: 3 + rnd() * 4.5, amber: false, ph: rnd()})
+    nodes.push({x, y, r: 3.5 + rnd() * 5, amber: false, ph: rnd()})
   }
   // a few "working" amber nodes
   const amberCount = 4
@@ -84,7 +84,7 @@ export function edgePath(g: Graph, e: GEdge) {
 /** Edge visibility 0..1 at time t: slow form / hold / dissolve. */
 export function edgeOpacity(e: GEdge, t: number) {
   const s = Math.sin(2 * Math.PI * (t / e.period + e.off))
-  const v = Math.min(1, Math.max(0, 0.35 + s))
+  const v = Math.min(1, Math.max(0, 0.5 + s))
   return r2(v * v * (3 - 2 * v))
 }
 

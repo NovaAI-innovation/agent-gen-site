@@ -40,6 +40,9 @@ export function AgentGraph() {
           <circle key={i} cx={r1(n.x)} cy={r1(n.y)} r={n.r * 5} fill="url(#g-glow)" opacity={glowAt(n, T0)} />
         ))}
       </g>
+      <g className="g-halos">
+        {g.nodes.map((n, i) => <circle key={i} cx={r1(n.x)} cy={r1(n.y)} r={r1(n.r * 2.4)} className={n.amber ? 'g-halo g-halo--amber' : 'g-halo'} />)}
+      </g>
       <g className="g-nodes">
         {g.nodes.map((n, i) => (
           <circle key={i} cx={r1(n.x)} cy={r1(n.y)} r={r1(n.r)} className={n.amber ? 'g-node g-node--amber' : 'g-node'} />
