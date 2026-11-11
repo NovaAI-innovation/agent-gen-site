@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.ssr/
+.content/
+.lighthouse/
+*.env
+.env*
+secrets/
