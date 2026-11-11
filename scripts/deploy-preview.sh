@@ -16,5 +16,10 @@ if [ $rc -ne 0 ]; then
   exit 3
 fi
 # Keep .well-known (ACME challenges) untouched; delete only stale build files.
-rsync -rlvz --delete --exclude='.well-known/' --chmod=D755,F644 -e "$SSH" dist/ "$HOST:$ROOT"
+if command -v rsync >/dev/null; then
+  rsync -rlvz --delete --exclude='.well-known/' --chmod=D755,F644 -e "$SSH" dist/ "$HOST:$ROOT"
+else
+  # One SSH connection (port 22 rate-limits bursts): clear old files except .well-known, then unpack.
+  tar -C dist -czf - . | $SSH "$HOST" "set -e; cd '$ROOT'; find . -mindepth 1 -maxdepth 1 ! -name .well-known -exec rm -rf {} +; tar -xzf - --no-same-owner; find . -path ./.well-known -prune -o -type d -exec chmod 755 {} + -o -type f -exec chmod 644 {} +"
+fi
 echo "deployed to https://preview.agent-gen.ca/"
