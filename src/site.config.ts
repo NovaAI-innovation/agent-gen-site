@@ -15,6 +15,14 @@ export const site = {
   locale: 'en-CA',
   /** Seed for the hero agent graph (prerendered SVG and animation share it). */
   graphSeed: 20261111,
+  /** Default share card (Design Lead R13). Canonicals and og:image use productionUrl. */
+  og: {
+    path: '/og-default.png',
+    width: 1200,
+    height: 630,
+    type: 'image/png',
+    alt: 'agent-gen wordmark beside a network of teal and amber nodes, with the line: Notes on AI agents.',
+  },
   sanity: {
     projectId: 'jqsksqmz',
     dataset: 'production',

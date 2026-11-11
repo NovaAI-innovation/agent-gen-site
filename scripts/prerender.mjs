@@ -13,7 +13,7 @@ if (content.siteEnv !== SITE_ENV) {
 
 // --- Syntax highlighting at build time (Shiki, CSS-variable theme mapped to tokens) ---
 const theme = createCssVariablesTheme({name: 'css-variables', variablePrefix: '--shiki-', fontStyle: true})
-const docs = [...content.posts, content.about].filter(Boolean)
+const docs = [...content.posts, content.about, ...(content.about?.sections || [])].filter(Boolean)
 const langs = new Set()
 for (const d of docs) for (const b of d.body || []) if (b._type === 'codeBlock') langs.add(b.language === 'text' ? 'text' : b.language || 'text')
 const highlighter = await createHighlighter({themes: [theme], langs: [...langs].filter((l) => l !== 'text')})

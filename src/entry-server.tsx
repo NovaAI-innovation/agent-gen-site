@@ -40,7 +40,12 @@ function head(opts: {env: SiteEnv; title: string; description: string; path: str
   tags.push(
     `<meta property="og:title" content="${esc(opts.ogTitle || opts.title)}">`,
     `<meta property="og:description" content="${esc(opts.ogDescription || opts.description)}">`,
-    `<meta name="twitter:card" content="summary">`,
+    `<meta property="og:image" content="${site.productionUrl}${site.og.path}">`,
+    `<meta property="og:image:width" content="${site.og.width}">`,
+    `<meta property="og:image:height" content="${site.og.height}">`,
+    `<meta property="og:image:type" content="${site.og.type}">`,
+    `<meta property="og:image:alt" content="${esc(site.og.alt)}">`,
+    `<meta name="twitter:card" content="summary_large_image">`,
   )
   if (opts.jsonLd) tags.push(`<script type="application/ld+json">${JSON.stringify(opts.jsonLd).replace(/</g, '\\u003c')}</script>`)
   return tags.join('\n')
@@ -69,7 +74,7 @@ export function buildPages(content: any, env: SiteEnv): {pages: PageOut[]; lang:
   pages.push({
     path: '/notes/', file: 'notes/index.html', graph: false, code: false, inSitemap: true,
     html: wrap('/notes/', <NotesIndex content={content} />),
-    head: head({...base, path: '/notes/', title: `Notes · ${siteName}`, description: 'Short posts on how AI agents work and what I learn while building them.',
+    head: head({...base, path: '/notes/', title: `Notes · ${siteName}`, description: 'Short posts on how AI agents work and what we learn while building them.',
       jsonLd: {'@context': 'https://schema.org', '@graph': [{'@type': 'CollectionPage', name: 'Notes', url: `${site.productionUrl}/notes/`, isPartOf: {'@id': `${site.productionUrl}/#website`}}, crumbs([['Home', '/'], ['Notes', '/notes/']])]}}),
   })
 

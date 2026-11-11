@@ -42,7 +42,7 @@ const query = `{
   "posts": *[_type == "post" && defined(slug.current)] | order(coalesce(publishedAt, _updatedAt) desc, title asc){
     _id, _updatedAt, title, "slug": slug.current, summary, publishedAt, updatedAt, tags, authorName, body, seo
   },
-  "about": *[_type == "page" && slug.current == "about"][0]{_updatedAt, title, "slug": slug.current, publishedAt, updatedAt, body, seo}
+  "about": *[_type == "page" && slug.current == "about"][0]{_updatedAt, title, "slug": slug.current, publishedAt, updatedAt, body, seo, sections[]{heading, voice, "anchor": anchor.current, body}}
 }`
 
 try {
