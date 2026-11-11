@@ -5,4 +5,5 @@ dist/
 .lighthouse/
 *.env
 .env*
+!.env.example
 secrets/

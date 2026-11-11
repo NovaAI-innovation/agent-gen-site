@@ -9,9 +9,12 @@ Content comes from Sanity (`jqsksqmz` / `production`) at build time only.
 - `npm run serve`: serve `dist/` locally on :4173.
 - `npm run deploy` / `deploy:preview`: rsync `dist/` to `/var/www/preview.agent-gen.ca/` only (keeps `.well-known/`).
 
-## Secrets
-The Sanity read token is read at build time from `SANITY_READ_TOKEN` or the env file at `SANITY_ENV_FILE`
-(default `/workspace/secrets/sanity-agent-gen.env`). It is never written to disk, the client bundle, or HTML.
+## Secrets and environment
+Copy `.env.example` to `.env` (gitignored) and fill in values. Scripts also read existing environment
+variables, which take precedence over `.env`.
+
+The Sanity read token is read at build time from `SANITY_READ_TOKEN` or the env file at `SANITY_ENV_FILE`.
+It is never written to disk, the client bundle, or HTML. Preview deploys use `DEPLOY_HOST` and `DEPLOY_KEY`.
 
 ## Config
 `src/site.config.ts` → `site.githubOrg` (null on day 1). While null, no repo/GitHub link renders anywhere.

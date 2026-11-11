@@ -65,10 +65,13 @@ for (const p of pages) {
   writeFileSync(out, tpl(p))
 }
 
-const today = new Date().toISOString().slice(0, 10)
+const sitemapUrls = pages.filter((p) => p.inSitemap).map((p) => {
+  const last = p.lastmod ? `<lastmod>${p.lastmod}</lastmod>` : ''
+  return `  <url><loc>${PROD}${p.path}</loc>${last}</url>`
+}).join('\n')
 writeFileSync('dist/sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${pages.filter((p) => p.inSitemap).map((p) => `  <url><loc>${PROD}${p.path}</loc><lastmod>${today}</lastmod></url>`).join('\n')}
+${sitemapUrls}
 </urlset>
 `)
 writeFileSync('dist/robots.txt', SITE_ENV === 'production'

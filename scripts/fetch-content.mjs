@@ -3,6 +3,9 @@
 // it is never written to disk, logged, or passed to the client bundle.
 import {createClient} from '@sanity/client'
 import {readFileSync, existsSync, mkdirSync, writeFileSync} from 'node:fs'
+import {loadEnv} from './load-env.mjs'
+
+loadEnv()
 
 const SITE_ENV = process.env.SITE_ENV === 'production' ? 'production' : 'preview'
 const envFile = process.env.SANITY_ENV_FILE || '/workspace/secrets/sanity-agent-gen.env'
@@ -34,12 +37,12 @@ const client = createClient({
 })
 
 const query = `{
-  "settings": *[_id == "siteSettings"][0]{siteTitle, tagline, description, siteUrl, locale, owner, github, mainNav, footer, defaultSeo},
-  "home": *[_id == "homePage"][0]{hero, purposeSections[]{..., "anchor": anchor.current}, contentSection{..., "anchor": anchor.current}, latestNotes, comingSoonNotice, seo},
+  "settings": *[_id == "siteSettings"][0]{_updatedAt, siteTitle, tagline, description, siteUrl, locale, owner, github, mainNav, footer, defaultSeo},
+  "home": *[_id == "homePage"][0]{_updatedAt, hero, purposeSections[]{..., "anchor": anchor.current}, contentSection{..., "anchor": anchor.current}, latestNotes, comingSoonNotice, seo},
   "posts": *[_type == "post" && defined(slug.current)] | order(coalesce(publishedAt, _updatedAt) desc, title asc){
     _id, _updatedAt, title, "slug": slug.current, summary, publishedAt, updatedAt, tags, authorName, body, seo
   },
-  "about": *[_type == "page" && slug.current == "about"][0]{_updatedAt, title, "slug": slug.current, body, seo}
+  "about": *[_type == "page" && slug.current == "about"][0]{_updatedAt, title, "slug": slug.current, publishedAt, updatedAt, body, seo}
 }`
 
 try {

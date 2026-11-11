@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 # Deploy dist/ to preview.agent-gen.ca ONLY. Never touches nginx, TLS, the apex, or services.
 set -euo pipefail
+ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+if [ -f "$ROOT_DIR/.env" ]; then
+  set -a
+  # shellcheck disable=SC1091
+  . "$ROOT_DIR/.env"
+  set +a
+fi
 HOST="${DEPLOY_HOST:-nostr@76.13.103.104}"
 KEY="${DEPLOY_KEY:-$HOME/.ssh/vps_buzz}"
 ROOT="/var/www/preview.agent-gen.ca/"
